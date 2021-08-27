@@ -42,7 +42,7 @@ def density_estimation(m1,m2):
     return X,Y,Z
 
 # settings
-systemname = 'Tropical Depression Nine'     # formal name (e.g. "Hurricane Wilma")
+systemname = 'Tropical Storm Ida'           # formal name (e.g. "Hurricane Wilma")
 savedir = 'images'                          # output directory
 systemid = '09L'                            # system ID number (e.g. "09L")
 map_extent = [-100, -70, 10, 35]            # [west,east,south,north]
@@ -165,7 +165,7 @@ for a,b in enumerate(gefs_members):
         name=b.strip(' ')
         plt.plot(lons,lats,linewidth=width,color=col,transform=ccrs.PlateCarree())
     plt.scatter(lons,lats,c=gefs_latest[gefs_latest['MODEL']==b]['MSLP'],cmap=cmap,\
-        transform=ccrs.PlateCarree(),vmax=1000,vmin=900,s=size,norm=norm)
+        transform=ccrs.PlateCarree(),s=size,norm=norm)
 plt.colorbar(label='Minimum Sea-Level Pressure (mb)',shrink=0.75,extend='both')
 plt.legend(fontsize=16)
 plt.title('GEFS Track Guidance for %s\nInitialized: %s' % (systemname,gefs_init),size=24)
@@ -210,7 +210,7 @@ for a,b in enumerate(geps_members):
         name=b.strip(' ')
         plt.plot(lons,lats,linewidth=width,color=col,transform=ccrs.PlateCarree())
     plt.scatter(lons,lats,c=geps_latest[geps_latest['MODEL']==b]['MSLP'],cmap=cmap,\
-        transform=ccrs.PlateCarree(),vmax=1000,vmin=900,s=size,norm=norm)
+        transform=ccrs.PlateCarree(),s=size,norm=norm)
 plt.colorbar(label='Minimum Sea-Level Pressure (mb)',shrink=0.75,extend='both')
 plt.legend(fontsize=16)
 plt.title('GEPS Track Guidance for %s\nInitialized: %s' % (systemname,geps_init),size=24)
@@ -238,7 +238,7 @@ for a,b in enumerate(naefs_members):
         naefs_latest[naefs_latest['MODEL']==b]['LAT']
     plt.plot(lons,lats,linewidth=0.5,color='black',transform=ccrs.PlateCarree())
     plt.scatter(lons,lats,c=naefs_latest[naefs_latest['MODEL']==b]['MSLP'],cmap=cmap,\
-        transform=ccrs.PlateCarree(),vmax=1000,vmin=900,s=10,norm=norm)
+        transform=ccrs.PlateCarree(),s=10,norm=norm)
 plt.colorbar(label='Minimum Sea-Level Pressure (mb)',shrink=0.75,extend='both')
 plt.title('NAEFS Track Guidance for %s\nInitialized: %s' % (systemname,naefs_init),size=32)
 plt.savefig('%s/%s_naefs.png' % (savedir,systemid),bbox_inches='tight')
