@@ -294,56 +294,60 @@ plt.title('Late-Cycle Track Guidance for %s\nInitialized: %s' % (systemname,late
 plt.savefig('%s/%s_late.png' % (savedir,systemid),bbox_inches='tight')
 plt.close('all')
 
-# NAEFS intensity
-# get the valid times
-initialized = dt.datetime.strptime(str(naefs_latest['INIT'].unique()[0]),'%Y%m%d%H')
-naefs_latest['VALID'] = [initialized + dt.timedelta(hours=x) for x in naefs_latest['TAU']]
-
-# set up the colorbar to shade boxes by median ensemble value
-median_vals = naefs_latest.groupby('TAU')['VMAX'].median()
-norm = plt.Normalize(0.0,150.0)
-colors = plt.cm.plasma(norm(median_vals))
-
-# create the boxplot
-sns.set_style('darkgrid')
-fig,ax = plt.subplots(figsize=(20,15))
-fig = sns.boxplot(x='VALID',y='VMAX',data=naefs_latest,palette=colors)
-
-# tick labels
-ax.set_xticklabels(labels=naefs_latest['VALID'].sort_values().dt.strftime('%d/%H').unique(),\
-                   rotation=90,fontsize=16)
-ax.set(yticks=np.arange(0,151,5))
-ax.tick_params(axis='y',labelsize=16)
-
-# category lines
-fig.axhline(34,linestyle='-',color='cyan')
-fig.text(0.25,36,'Tropical Storm',weight='bold',size=14,color='cyan')
-fig.axhline(64,linestyle='-',color='red')
-fig.text(0.25,66,'Hurricane/Category 1',weight='bold',size=14,color='red')
-fig.axhline(83,linestyle='--',color='gray')
-fig.text(0.25,85,'Category 2',weight='bold',size=14,color='gray')
-fig.axhline(96,linestyle='-',color='magenta')
-fig.text(0.25,98,'Major Hurricane/Category 3',weight='bold',size=14,color='magenta')
-fig.axhline(113,linestyle='--',color='gray')
-fig.text(0.25,115,'Category 4',weight='bold',size=14,color='gray')
-fig.axhline(137,linestyle='--',color='gray')
-fig.text(0.25,139,'Category 5',weight='bold',size=14,color='gray')
-
-# axis labels and chart title
-fig.set_xlabel('Valid Time (UTC)',fontsize=20)
-fig.set_ylabel('Maximum Sustained Winds (kt)',fontsize=20)
-fig.set_title('NAEFS Intensity Forecasts for %s\nInitialized at %s' % (systemname,naefs_init),\
-              fontsize=32)
-
-# colorbar
-cb = fig.figure.colorbar(plt.cm.ScalarMappable(cmap='plasma',norm=norm),shrink=0.75)
-cb.ax.tick_params(labelsize=16)
-cb.set_ticks(np.arange(0,151,10))
-cb.set_label(label='Maximum Sustained Winds (kt) of median member', size=16)
+# intensity plots
+datasets = [naefs_latest,late_df]
+dataset_names = ['NAEFS','Late-Cycle']
+for ix,dataset in enumerate(datasets):
+    # get the valid times
+    initialized = dt.datetime.strptime(str(dataset['INIT'].unique()[0]),'%Y%m%d%H')
+    dataset['VALID'] = [initialized + dt.timedelta(hours=x) for x in dataset['TAU']]
     
-# save figure
-plt.savefig('%s/%s_vmax_naefs.png' % (savedir,systemid),bbox_inches='tight')
-plt.close('all')
+    # set up the colorbar to shade boxes by median ensemble value
+    median_vals = dataset.groupby('TAU')['VMAX'].median()
+    norm = plt.Normalize(0.0,150.0)
+    colors = plt.cm.plasma(norm(median_vals))
+    
+    # create the boxplot
+    sns.set_style('darkgrid')
+    fig,ax = plt.subplots(figsize=(20,15))
+    fig = sns.boxplot(x='VALID',y='VMAX',data=dataset,palette=colors)
+    
+    # tick labels
+    ax.set_xticklabels(labels=dataset['VALID'].sort_values().dt.strftime('%d/%H').unique(),\
+                       rotation=90,fontsize=16)
+    ax.set(yticks=np.arange(0,151,5))
+    ax.tick_params(axis='y',labelsize=16)
+    
+    # category lines
+    fig.axhline(34,linestyle='-',color='cyan')
+    fig.text(0.25,36,'Tropical Storm',weight='bold',size=14,color='cyan')
+    fig.axhline(64,linestyle='-',color='red')
+    fig.text(0.25,66,'Hurricane/Category 1',weight='bold',size=14,color='red')
+    fig.axhline(83,linestyle='--',color='gray')
+    fig.text(0.25,85,'Category 2',weight='bold',size=14,color='gray')
+    fig.axhline(96,linestyle='-',color='magenta')
+    fig.text(0.25,98,'Major Hurricane/Category 3',weight='bold',size=14,color='magenta')
+    fig.axhline(113,linestyle='--',color='gray')
+    fig.text(0.25,115,'Category 4',weight='bold',size=14,color='gray')
+    fig.axhline(137,linestyle='--',color='gray')
+    fig.text(0.25,139,'Category 5',weight='bold',size=14,color='gray')
+    
+    # axis labels and chart title
+    fig.set_xlabel('Valid Time (UTC)',fontsize=20)
+    fig.set_ylabel('Maximum Sustained Winds (kt)',fontsize=20)
+    fig.set_title('%s Intensity Forecasts for %s\nInitialized at %s' % \
+                  (dataset_names[ix],systemname,naefs_init),fontsize=32)
+    
+    # colorbar
+    cb = fig.figure.colorbar(plt.cm.ScalarMappable(cmap='plasma',norm=norm),shrink=0.75)
+    cb.ax.tick_params(labelsize=16)
+    cb.set_ticks(np.arange(0,151,10))
+    cb.set_label(label='Maximum Sustained Winds (kt) of median member', size=16)
+        
+    # save figure
+    plt.savefig('%s/%s_vmax_%s.png' % (savedir,systemid,dataset_names[ix].lower()),\
+                bbox_inches='tight')
+    plt.close('all')
 
 '''
 # KDE at each valid time
