@@ -43,11 +43,11 @@ def density_estimation(m1,m2):
     return X,Y,Z
 
 # settings
-systemname = 'Tropical Storm Ida'           # formal name (e.g. "Hurricane Wilma")
+systemname = 'Hurricane Ida'                # formal name (e.g. "Hurricane Wilma")
 savedir = 'images'                          # output directory
 systemid = '09L'                            # system ID number (e.g. "09L")
 map_limit = True                            # limit the map extent? otherwise plot entire domain
-map_extent = [-95, -85, 20, 35]            # [west,east,south,north]
+map_extent = [-95, -85, 20, 35]             # [west,east,south,north]
 kde_levs = 11                               # how many color levels to plot for KDE
 kde_color = 'plasma'                        # colormap to use for KDE plots
 nhc_intensity = False                       # plot official intensity? (broken at the moment)
@@ -346,8 +346,8 @@ for ix,dataset in enumerate(datasets):
     ax.tick_params(axis='y',labelsize=16)
     
     # category lines
-    fig.axhline(34,linestyle='-',color='cyan')
-    fig.text(0.25,36,'Tropical Storm',weight='bold',size=14,color='cyan')
+    fig.axhline(34,linestyle='-',color='orange')
+    fig.text(0.25,36,'Tropical Storm',weight='bold',size=14,color='orange')
     fig.axhline(64,linestyle='-',color='red')
     fig.text(0.25,66,'Hurricane/Category 1',weight='bold',size=14,color='red')
     fig.axhline(83,linestyle='--',color='gray')
