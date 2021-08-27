@@ -11,6 +11,7 @@ import matplotlib as mpl
 import numpy as np
 import cartopy.crs as ccrs
 import cartopy.feature as cfeature
+import cartopy.io.shapereader as shpreader
 import datetime as dt
 import seaborn as sns
 
@@ -45,9 +46,12 @@ def density_estimation(m1,m2):
 systemname = 'Tropical Storm Ida'           # formal name (e.g. "Hurricane Wilma")
 savedir = 'images'                          # output directory
 systemid = '09L'                            # system ID number (e.g. "09L")
-map_extent = [-100, -70, 10, 35]            # [west,east,south,north]
+map_limit = True                            # limit the map extent? otherwise plot entire domain
+map_extent = [-95, -85, 20, 35]            # [west,east,south,north]
 kde_levs = 11                               # how many color levels to plot for KDE
 kde_color = 'plasma'                        # colormap to use for KDE plots
+nhc_intensity = False                       # plot official intensity? (broken at the moment)
+draw_counties = True                        # draw county maps?
 atcf_file = \
     'http://hurricanes.ral.ucar.edu/realtime/plots/northatlantic/2021/al092021/aal092021.dat'
 
@@ -124,13 +128,19 @@ Xnaefs,Ynaefs,Znaefs = density_estimation(naefs_latest['LON'],naefs_latest['LAT'
 fig = plt.figure(figsize=(20,15))
 ax = plt.axes(projection=ccrs.PlateCarree(),frameon=False)
 ax.patch.set_visible(False)
-#ax.set_extent(map_extent, ccrs.PlateCarree())
+if map_limit:
+    ax.set_extent(map_extent, ccrs.PlateCarree())
 ax.add_feature(cfeature.LAND)
 ax.add_feature(cfeature.OCEAN)
 ax.add_feature(cfeature.COASTLINE)
 ax.add_feature(cfeature.BORDERS)
 ax.add_feature(cfeature.STATES)
 ax.add_feature(cfeature.LAKES, alpha=0.5)
+if draw_counties:
+    reader = shpreader.Reader('gis/cb_2018_us_county_500k.shp')
+    counties = list(reader.geometries())
+    COUNTIES = cfeature.ShapelyFeature(counties,ccrs.PlateCarree())
+    ax.add_feature(COUNTIES, facecolor='none', edgecolor='gray')
 
 # create colorbar for pressure
 cmap = plt.cm.RdYlBu
@@ -176,13 +186,16 @@ plt.close('all')
 fig = plt.figure(figsize=(20,15))
 ax = plt.axes(projection=ccrs.PlateCarree(),frameon=False)
 ax.patch.set_visible(False)
-#ax.set_extent(map_extent, ccrs.PlateCarree())
+if map_limit:
+    ax.set_extent(map_extent, ccrs.PlateCarree())
 ax.add_feature(cfeature.LAND)
 ax.add_feature(cfeature.OCEAN)
 ax.add_feature(cfeature.COASTLINE)
 ax.add_feature(cfeature.BORDERS)
 ax.add_feature(cfeature.STATES)
 ax.add_feature(cfeature.LAKES, alpha=0.5)
+if draw_counties:
+    ax.add_feature(COUNTIES, facecolor='none', edgecolor='gray')
 
 # plot the kde for GEFS members
 plt.contourf(Xgeps,Ygeps,Zgeps,levels=np.linspace(0.001,Zgeps.max(),kde_levs),alpha=0.75,\
@@ -221,13 +234,16 @@ plt.close('all')
 fig = plt.figure(figsize=(20,15))
 ax = plt.axes(projection=ccrs.PlateCarree(),frameon=False)
 ax.patch.set_visible(False)
-#ax.set_extent(map_extent, ccrs.PlateCarree())
+if map_limit:
+    ax.set_extent(map_extent, ccrs.PlateCarree())
 ax.add_feature(cfeature.LAND)
 ax.add_feature(cfeature.OCEAN)
 ax.add_feature(cfeature.COASTLINE)
 ax.add_feature(cfeature.BORDERS)
 ax.add_feature(cfeature.STATES)
 ax.add_feature(cfeature.LAKES, alpha=0.5)
+if draw_counties:
+    ax.add_feature(COUNTIES, facecolor='none', edgecolor='gray')
 
 # plot the kde for early cycle guidance
 plt.contourf(Xnaefs,Ynaefs,Znaefs,levels=np.linspace(0.001,Znaefs.max(),kde_levs),alpha=0.75,\
@@ -248,13 +264,16 @@ plt.close('all')
 fig = plt.figure(figsize=(20,15))
 ax = plt.axes(projection=ccrs.PlateCarree(),frameon=False)
 ax.patch.set_visible(False)
-#ax.set_extent(map_extent, ccrs.PlateCarree())
+if map_limit:
+    ax.set_extent(map_extent, ccrs.PlateCarree())
 ax.add_feature(cfeature.LAND)
 ax.add_feature(cfeature.OCEAN)
 ax.add_feature(cfeature.COASTLINE)
 ax.add_feature(cfeature.BORDERS)
 ax.add_feature(cfeature.STATES)
 ax.add_feature(cfeature.LAKES, alpha=0.5)
+if draw_counties:
+    ax.add_feature(COUNTIES, facecolor='none', edgecolor='gray')
 
 # plot the kde for early cycle guidance
 plt.contourf(Xec,Yec,Zec,levels=np.linspace(0.001,Zec.max(),kde_levs),alpha=0.75,cmap=kde_color)
@@ -273,13 +292,16 @@ plt.close('all')
 fig = plt.figure(figsize=(20,15))
 ax = plt.axes(projection=ccrs.PlateCarree(),frameon=False)
 ax.patch.set_visible(False)
-#ax.set_extent(map_extent, ccrs.PlateCarree())
+if map_limit:
+    ax.set_extent(map_extent, ccrs.PlateCarree())
 ax.add_feature(cfeature.LAND)
 ax.add_feature(cfeature.OCEAN)
 ax.add_feature(cfeature.COASTLINE)
 ax.add_feature(cfeature.BORDERS)
 ax.add_feature(cfeature.STATES)
 ax.add_feature(cfeature.LAKES, alpha=0.5)
+if draw_counties:
+    ax.add_feature(COUNTIES, facecolor='none', edgecolor='gray')
 
 # plot the kde for late cycle guidance
 plt.contourf(Xlc,Ylc,Zlc,levels=np.linspace(0.001,Zlc.max(),kde_levs),alpha=0.75,cmap=kde_color)
@@ -295,8 +317,11 @@ plt.savefig('%s/%s_late.png' % (savedir,systemid),bbox_inches='tight')
 plt.close('all')
 
 # intensity plots
-datasets = [naefs_latest,late_df]
-dataset_names = ['NAEFS','Late-Cycle']
+datasets = [naefs_latest,late_df,latest]
+dataset_names = ['NAEFS','Late-Cycle','Early-Cycle']
+official = atcf_df[atcf_df['MODEL']==' OFCI'][atcf_df['INIT']==atcf_df['INIT'].max()]
+initialized = dt.datetime.strptime(str(official['INIT'].unique()[0]),'%Y%m%d%H')
+official['VALID'] = [initialized + dt.timedelta(hours=x) for x in official['TAU']]
 for ix,dataset in enumerate(datasets):
     # get the valid times
     initialized = dt.datetime.strptime(str(dataset['INIT'].unique()[0]),'%Y%m%d%H')
@@ -310,7 +335,9 @@ for ix,dataset in enumerate(datasets):
     # create the boxplot
     sns.set_style('darkgrid')
     fig,ax = plt.subplots(figsize=(20,15))
-    fig = sns.boxplot(x='VALID',y='VMAX',data=dataset,palette=colors)
+    if nhc_intensity:
+        fig = sns.pointplot(x='VALID',y='VMAX',data=official,color='black',linewidth=2,ax=ax)
+    fig = sns.boxplot(x='VALID',y='VMAX',data=dataset,palette=colors,ax=ax)
     
     # tick labels
     ax.set_xticklabels(labels=dataset['VALID'].sort_values().dt.strftime('%d/%H').unique(),\
